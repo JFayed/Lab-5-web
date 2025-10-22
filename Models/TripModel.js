@@ -1,6 +1,6 @@
 const trips = [
     {
-        id: 1;
+        id: 1,
         destinationName: 'Paris',
         location: 'France',
         continent: 'Europe',
@@ -115,4 +115,3 @@ const trips = [
     
     module.exports = { trips, };
     
-]
