@@ -1,5 +1,5 @@
 const express = require('express');
-const TripRouter=require('./Routes/TripRoutes.js');//
+const tripRouter=require('./Routes/TripRoutes.js');//
 
 const app = express();
 
@@ -9,7 +9,7 @@ app.use(express.json());
 // if the request starts with /api/v1/trips,
 // it will be handeled by TripRouter
 
-app.use('/trips', TripRouter);
+app.use('/trips', tripRouter);
 
 module.exports =
 {

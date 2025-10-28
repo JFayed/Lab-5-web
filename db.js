@@ -1,0 +1,22 @@
+const sqlite = require (`sqlite3`);
+const db = new sqlite.Database(`travel.db`)
+// New Trip Table 
+ const createTripTable = `Create Table if not exists Trip (
+ ID INTEGER PRIMARY KEY AUTOINCREMENT,
+ DESTINATIONNAME TEXT NOT NULL,
+ LOCATION TEXT NOT NULL,
+ CONTINENT TEXT NOT NULL,
+ LANGUAGE TEXT NOT NULL,
+ DESCRIPTION TEXT NOT NULL,
+ FLIGHTCOST REAL DEFAULT 0,
+ ACCOMMODATIONCOST REAL DEFAULT 0,
+ MEALCOST REAL DEFAULT 0,
+ VISACOST REAL DEFAULT 0,
+ TRANSPORTATIONCOST REAL DEFAULT 0,
+ CURRENCYCODE TEXT DEFAULT 'N/A'
+ )`;
+
+ module.exports = {
+    db,
+    createTripTable,
+ }
