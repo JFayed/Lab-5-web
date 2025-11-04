@@ -18,5 +18,3 @@ const db = new sqlite.Database(`travel.db`)
 
  module.exports = {
     db,
-    createTripTable,
- }
