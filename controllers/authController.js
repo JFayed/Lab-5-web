@@ -38,3 +38,52 @@ bcrypt.compare(plainPassword, hashedPassword, (err, isMatch) => {
     // Invalid credentials
     }
 });
+
+// Login function 
+const bcrypt = require('bcrypt');
+const login = (req, res) => {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Please provide email and password' });
+    }
+
+}
+    // First, find user by email in database
+    const findUserQuery = `SELECT * FROM USER WHERE EMAIL = '${email}'`;
+    
+    db.get(findUserQuery, async (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+        
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Compare provided password with stored hash
+        bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ message: 'Error verifying password' });
+            }
+            
+            if (isMatch) {
+                 // Correct password - login successful
+                return res.status(200).json({ 
+                    message: 'Login successful',
+                    user: {
+                        id: user.ID,
+                        name: user.NAME,
+                        email: user.EMAIL,
+                        role: user.ROLE
+                    }
+                });
+            } else {
+                // Invalid password
+                return res.status(401).json({ message: 'Invalid credentials' });
+            }
+        });
+    });
