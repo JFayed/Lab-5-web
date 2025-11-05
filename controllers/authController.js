@@ -1,5 +1,45 @@
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { db } = require('../db.js');
+
+const signToken = (id , role) => {
+    return jwt.sign({id, role}, process.env.JWT_SECRET, {expireIn: process.env.JWT_EXPIRES_IN});
+}
+
+// Login function 
+const login = (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).send({ message: 'Please provide email and password' });
+    }
+    const query = `SELECT * FROM USER WHERE EMAIL = '${email}'`;
+    db.get(query, (err, row) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send({ message: 'Database error' });
+        }
+        bcrypt.compare(password, row.PASSWORD, (err, isMatch) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send({ message: 'Error verifying password' });
+            }
+            
+                 const token = signToken(row.ID, row.ROLE);  
+        
+                 return res.status(200).json({  
+                    message: 'Login successful',  
+                    user: {
+                    id: row.ID,  
+                    name: row.NAME,  
+                    email: row.EMAIL,  
+                    role: row.ROLE,  
+                },
+                token,
+            });
+        });
+    });
+};
+
 
 //POST /signup
 const signUp = (req, res) => {  
@@ -12,78 +52,33 @@ const signUp = (req, res) => {
     return res.status(400).send('Please provide name, email, and password');
 }
  bcrypt.hash(password, 10, (err, hashedPassowrd) => {
-    
-    const query = `
-    INSERT INTO USER (NAME, EMAIL, ROLE, PASSWORD)
-    VALUES ('${name}', '${email}', '${role}', '${password}')
-    `;
+    if (err) {
+        console.error(err);
+        return res.status(400).send('Error hasing password.');
+    }
+      
+    //Insert 
+      const query = `
+      INSERT INTO USER (NAME, EMAIL, ROLE, PASSWORD)
+      VALUES ('${name}', '${email}', '${role}', '${password}')
+      `;
 
     db.run(query, (err) => {
         if(err) {
-            console.log(err.message);
             if (err.message.includes('Unique constraint')){
                 return res.status(400).send('Email already exisits');
             }
+            console.log(err.message);
             return res.status(500).send('Databade Error.');
         }
 
-        return res.status(200).send('Registration successful.');
-    });
-    } )
-};
-bcrypt.compare(plainPassword, hashedPassword, (err, isMatch) => {
-    if (isMatch) {
-    // Correct password!
-    } else {
-    // Invalid credentials
-    }
-});
-
-// Login function 
-const bcrypt = require('bcrypt');
-const login = (req, res) => {
-    const { email, password } = req.body;
-
-    // Validate input
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Please provide email and password' });
-    }
-
-}
-    // First, find user by email in database
-    const findUserQuery = `SELECT * FROM USER WHERE EMAIL = '${email}'`;
-    
-    db.get(findUserQuery, async (err, user) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({ message: 'Database error' });
-        }
-        
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-
-        // Compare provided password with stored hash
-        bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ message: 'Error verifying password' });
-            }
-            
-            if (isMatch) {
-                 // Correct password - login successful
-                return res.status(200).json({ 
-                    message: 'Login successful',
-                    user: {
-                        id: user.ID,
-                        name: user.NAME,
-                        email: user.EMAIL,
-                        role: user.ROLE
-                    }
-                });
-            } else {
-                // Invalid password
-                return res.status(401).json({ message: 'Invalid credentials' });
-            }
+        //Create TOKEN
+        const token = signToken(this.lastID, role);
+         return res.status(201).json({
+            status: 'success',
+            message:'Registration successful.',
+            token,
+         });
         });
-    });
+ });
+};
