@@ -1,4 +1,3 @@
-
 const {trips} = require('../Models/TripModel');
 const {db} = require('../db.js')
 

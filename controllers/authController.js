@@ -12,7 +12,7 @@ const login = (req, res) => {
     if (!email || !password) {
         return res.status(400).send({ message: 'Please provide email and password' });
     }
-    const query = `SELECT * FROM USER WHERE EMAIL = '${email}'`;
+    const query = `SELECT * FROM USER WHERE EMAIL = '?'`;
     db.get(query, (err, row) => {
         if (err) {
             console.log(err);
@@ -49,9 +49,10 @@ const signUp = (req, res) => {
     const role = 'user'; // default to non-admin  
 
     if (!name || !email || !password) {
-    return res.status(400).send('Please provide name, email, and password');
+        return res.status(400).send('Please provide name, email, and password');
 }
  bcrypt.hash(password, 10, (err, hashedPassowrd) => {
+
     if (err) {
         console.error(err);
         return res.status(400).send('Error hasing password.');
@@ -60,8 +61,7 @@ const signUp = (req, res) => {
     //Insert 
       const query = `
       INSERT INTO USER (NAME, EMAIL, ROLE, PASSWORD)
-      VALUES ('${name}', '${email}', '${role}', '${password}')
-      `;
+      VALUES ('?, ?, ?, ?')`;
 
     db.run(query, (err) => {
         if(err) {

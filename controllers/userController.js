@@ -25,7 +25,7 @@ const createUser = (req, res) => {
 
         const query = `
             INSERT INTO USER (NAME, EMAIL, ROLE, PASSWORD)  
-            VALUES ('${name}', '${email}', '${role}', '${hashedPassword}')
+            VALUES (?, ?, ?, ?')
         `;
         
         db.run(query, function(err) {
@@ -91,14 +91,14 @@ const updateUserById = (req, res) => {
     }
 
     let updateFields = [];
-    if (name) updateFields.push(`NAME = '${name}'`);
-    if (email) updateFields.push(`EMAIL = '${email}'`);
-    if (role) updateFields.push(`ROLE = '${role}'`);
+    if (name) updateFields.push(`NAME = '?'`);
+    if (email) updateFields.push(`EMAIL = '?'`);
+    if (role) updateFields.push(`ROLE = '?'`);
 
     const query = `
         UPDATE USER 
         SET ${updateFields.join(', ')} 
-        WHERE ID = ${id}
+        WHERE ID = ?
     `;
 
     db.run(query, function(err) {
@@ -121,7 +121,7 @@ const updateUserById = (req, res) => {
 // Delete user by ID
 const deleteUserById = (req, res) => {
     const id = req.params.id;
-    const query = `DELETE FROM USER WHERE ID = ${id}`;
+    const query = `DELETE FROM USER WHERE ID = ?`;
 
     db.run(query, function(err) {
         if (err) {
